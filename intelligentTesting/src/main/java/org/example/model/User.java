@@ -1,28 +1,55 @@
 package org.example.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
-@Getter
-@Setter
+
+import javax.annotation.Generated;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+@AllArgsConstructor
+@Generated("jsonschema2pojo")
 public class User {
-    private String login;
-    private String password;
-    private String  firstName;
-    private String lastName;
-    private String patronymic;
-    private String birthday;
-    private int group;
-    private String secretQuestion;
-    private String answerOnQuestion;
-    private String email;
-    private String numberPhone;
-    private String icon;
-    private Role role;
 
-    public User(String login, String password, String firstName, String lastName, String patronymic, String birthday, int group, String secretQuestion, String answerOnQuestion, String email, String numberPhone, String icon, Role role) {
+    @SerializedName("login")
+    @Expose
+    private String login;
+    @SerializedName("password")
+    @Expose
+    private String password;
+    @SerializedName("firstName")
+    @Expose
+    private String firstName;
+    @SerializedName("lastName")
+    @Expose
+    private String lastName;
+    @SerializedName("patronymic")
+    @Expose
+    private String patronymic;
+    @SerializedName("birthday")
+    @Expose
+    private String birthday;
+    @SerializedName("group")
+    @Expose
+    private int group;
+    @SerializedName("secretQuestion")
+    @Expose
+    private String secretQuestion;
+    @SerializedName("answerOnQuestion")
+    @Expose
+    private String answerOnQuestion;
+    @SerializedName("email")
+    @Expose
+    private String email;
+    @SerializedName("numberPhone")
+    @Expose
+    private String numberPhone;
+    @SerializedName("countItogTest")
+    @Expose
+    private int countItogTest;
+    @SerializedName("blocked")
+    @Expose
+    private boolean blocked;
+    public User(String login, String password, String firstName, String lastName, String patronymic, String birthday, int group, String secretQuestion, String answerOnQuestion, String email, String numberPhone, int countItogTest, boolean blocked) {
         this.login = login;
         this.password = password;
         this.firstName = firstName;
@@ -34,10 +61,9 @@ public class User {
         this.answerOnQuestion = answerOnQuestion;
         this.email = email;
         this.numberPhone = numberPhone;
-        this.icon = icon;
-        this.role = role;
+        this.countItogTest = countItogTest;
+        this.blocked = blocked;
     }
-
     public String getLogin() {
         return login;
     }
@@ -86,11 +112,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public int getGroup() {
+    public Integer getGroup() {
         return group;
     }
 
-    public void setGroup(int group) {
+    public void setGroup(Integer group) {
         this.group = group;
     }
 
@@ -126,19 +152,20 @@ public class User {
         this.numberPhone = numberPhone;
     }
 
-    public String getIcon() {
-        return icon;
+    public Integer getCountItogTest() {
+        return countItogTest;
     }
 
-    public void setIcon(String icon) {
-        this.icon = icon;
+    public void setCountItogTest(Integer countItogTest) {
+        this.countItogTest = countItogTest;
     }
 
-    public Role getRole() {
-        return role;
+    public Boolean getBlocked() {
+        return blocked;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setBlocked(Boolean blocked) {
+        this.blocked = blocked;
     }
+
 }
