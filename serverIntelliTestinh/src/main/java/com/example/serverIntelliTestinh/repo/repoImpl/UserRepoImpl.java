@@ -2,7 +2,6 @@ package com.example.serverIntelliTestinh.repo.repoImpl;
 
 import com.example.serverIntelliTestinh.model.User;
 import com.example.serverIntelliTestinh.repo.UserRepo;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +9,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import java.io.*;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserRepoImpl implements UserRepo {
-    private final String db = "C:\\Users\\bkmzo\\IdeaProjects\\serverIntelliTestinh\\src\\main\\resources\\Users\\DBUsers.sys";
+    private final String db = "/home/iliya/IdeaProjects/serverIntelliTestinh/src/main/resources/Users/DBUsers.sys";
     @Override
     public void save(User user) throws IOException {
         String db = new BufferedReader(new FileReader(this.db)).lines().collect(Collectors.joining());
@@ -65,5 +63,13 @@ public class UserRepoImpl implements UserRepo {
         BufferedWriter writer = new BufferedWriter(new FileWriter(this.db));
         writer.write(updatedJsonString);
         writer.close();
+    }
+
+    @Override
+    public User[] getAll() throws FileNotFoundException, JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String db = new BufferedReader(new FileReader(this.db)).lines().collect(Collectors.joining());
+        User[] users = mapper.readValue(db,User[].class);
+        return users;
     }
 }
