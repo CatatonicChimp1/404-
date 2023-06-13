@@ -7,6 +7,7 @@ import retrofit2.Call;
 import retrofit2.http.*;
 
 public interface ApiService {
+    //Было бы славно её настроить для SpringBoot, ну или костыли...
     @Multipart
     @POST("/user/add")
     Call<RequestBody> addUser(@Part("User") User user, @Part MultipartBody.Part image);
