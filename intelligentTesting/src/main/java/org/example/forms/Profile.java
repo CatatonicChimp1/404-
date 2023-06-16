@@ -1,13 +1,26 @@
 package org.example.forms;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
 import org.example.global.GlobalVariables;
+import org.example.model.Alert;
+import org.example.model.Test.Test;
 import org.example.model.User;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.sql.Array;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Profile extends JFrame {
     private JTextField loginField;
@@ -30,7 +43,10 @@ public class Profile extends JFrame {
     private JButton buttonToTest;
     private JButton buttonToItogTest;
 
-    public Profile() {
+    private String[] columnNameForAdmin = new String[] {"login", "firstName", "lastName", "patronymic", "birthday",
+    "group", "email", "phone", "countItogTest", "blocked"};
+
+    public Profile() throws IOException {
         // настройка окна
         setTitle("Личный кабинет");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -38,8 +54,14 @@ public class Profile extends JFrame {
 
         // создание панели для личной информации
         personalInfoPanel = new JPanel();
+
         personalInfoPanel.setBorder(BorderFactory.createTitledBorder("Личная информация"));
         personalInfoPanel.setLayout(new BoxLayout(personalInfoPanel, BoxLayout.Y_AXIS));
+
+        JPanel panelForAdmin = new JPanel();
+
+        panelForAdmin.setBorder(BorderFactory.createTitledBorder("Уведомления"));
+        panelForAdmin.setLayout(new BoxLayout(panelForAdmin, BoxLayout.Y_AXIS));
 
         loginField = new JTextField();
         passwordField = new JPasswordField();
@@ -105,9 +127,82 @@ public class Profile extends JFrame {
         testResultsPanel.add(scrollPane);
         personalInfoPanel.add(testResultsPanel);
 
-        JPanel panelForAdmin = new JPanel();
-        panelForAdmin.add(new JTable());
+        List<User> usersList =  new ArrayList<>();
 
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        RequestBody body = RequestBody.create(mediaType, "");
+        Request requestAllUsers = new Request.Builder()
+                .url("http://localhost:8080/user/all")
+                .method("GET", null)
+                .build();
+        Response responseAllUsers = client.newCall(requestAllUsers).execute();
+
+        String responseStr = responseAllUsers.body().string();
+
+        java.lang.reflect.Type listType = new TypeToken<List<User>>(){}.getType();
+        usersList = new Gson().fromJson(responseStr,listType);
+
+        String userToString[][] = new String[usersList.size()][columnNameForAdmin.length];
+
+        for(int i=0;i< usersList.size();i++)
+        {
+                userToString[i][0] = usersList.get(i).getLogin();
+                userToString[i][1] = usersList.get(i).getFirstName();
+                userToString[i][2] = usersList.get(i).getLastName();
+                userToString[i][3] = usersList.get(i).getPatronymic();
+                userToString[i][4] = usersList.get(i).getBirthday();
+                userToString[i][5] = String.valueOf(usersList.get(i).getGroup());
+                userToString[i][6] = usersList.get(i).getEmail();
+                userToString[i][7] = usersList.get(i).getNumberPhone();
+                userToString[i][8] = String.valueOf(usersList.get(i).getCountItogTest());
+                userToString[i][9] = String.valueOf(usersList.get(i).getBlocked());
+        }
+
+        //TableModel tableModel =  new DefaultTableModel(usersList.toArray(new User[][]{}), Arrays.stream(columnNameForAdmin).toArray());
+
+        JTable tableAllUsers = new JTable(userToString,columnNameForAdmin); //TODO доделать
+        JScrollPane scrollPaneAdmin = new JScrollPane(tableAllUsers);
+        panelForAdmin.add(scrollPaneAdmin);
+        panelForAdmin.add(tableAllUsers);
+
+        panelForAdmin.add(tableAllUsers.getTableHeader(), BorderLayout.NORTH);
+
+
+        JList alertList = new JList();
+        alertList.setBorder(new LineBorder(Color.black));
+        panelForAdmin.add(alertList);
+
+        Gson gsonAlert = new Gson();
+
+        JButton refresh = new JButton("Обновить");
+        panelForAdmin.add(refresh);
+
+        refresh.addActionListener(e->{
+            OkHttpClient clientAllUsers = new OkHttpClient().newBuilder()
+                    .build();
+            MediaType mediaTypeAllUsers = MediaType.parse("text/plain");
+            RequestBody bodyAllUsers = RequestBody.create(mediaTypeAllUsers, "");
+            Request request = new Request.Builder()
+                    .url("http://localhost:8080/alert/all")
+                    .method("GET", null)
+                    .build();
+            try {
+                Response response = clientAllUsers.newCall(request).execute();
+                assert response.body() != null;
+                java.lang.reflect.Type listAlertType = new TypeToken<List<Alert>>(){}.getType();
+                String jsonStr = response.body().string();
+                List<Alert> alertList1 = new Gson().fromJson(jsonStr, listAlertType);
+                for(int i =0;i<alertList1.size();i++)
+                {
+                    panelForAdmin.add(new JLabel(String.valueOf(alertList1.get(i).getId())));
+                    panelForAdmin.add(new JLabel(alertList1.get(i).getDescription()));
+                }
+            } catch (IOException ee) {
+                throw new RuntimeException(ee);
+            }
+        });
         JPanel panelForAnalyst = new JPanel();
 
         JTabbedPane jTabbedPane = new JTabbedPane();
@@ -119,16 +214,12 @@ public class Profile extends JFrame {
         //getContentPane().add(personalInfoPanel, BorderLayout.WEST);
         //getContentPane().add(testResultsPanel, BorderLayout.CENTER);
         add(jTabbedPane);
-        // отображение окна
-        setVisible(true);
 
 
         editPersonalInfoButton.addActionListener(e->{
-            //Отправляем запрос на обновление информации
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("application/json");
-            RequestBody body = RequestBody.create(mediaType, " {\n  " +
+            //Отпраляем запрос на обновление информации
+            MediaType mediaTypeUpdate = MediaType.parse("application/json");
+            RequestBody bodyUpdate = RequestBody.create(mediaTypeUpdate, " {\n  " +
                     "\"login\" : \""+ GlobalVariables.USER.getLogin() +"\",\n  " +
                     "\"password\" : \""+passwordField.getText()+"\",\n  " +
                     "\"firstName\" : \""+nameField.getText()+"\",\n  " +
@@ -142,7 +233,7 @@ public class Profile extends JFrame {
                     "\"numberPhone\" : \""+phoneField.getText()+"\"\n} ");
             Request request = new Request.Builder()
                     .url("http://localhost:8080/user/update?login="+GlobalVariables.USER.getLogin())
-                    .method("PUT", body)
+                    .method("PUT", bodyUpdate)
                     .addHeader("Content-Type", "application/json")
                     .build();
             try {
@@ -151,7 +242,7 @@ public class Profile extends JFrame {
                 throw new RuntimeException(ex);
             }
 
-            //Получаем новую информацию
+            //Получаем новую тинформацию
             Request requestFromClient = new Request.Builder()
                     .url("http://localhost:8080/user/login?login="+GlobalVariables.USER.getLogin()+
                             "password="+passwordField.getText())
@@ -166,9 +257,40 @@ public class Profile extends JFrame {
                 throw new RuntimeException(ex);
             }
         });
+
+        deleteAccountButton.addActionListener(e->{
+            MediaType mediaTypeDelete = MediaType.parse("text/plain");
+            RequestBody bodyDelete = RequestBody.create(mediaTypeDelete, "");
+            Request request = new Request.Builder()
+                    .url("http://localhost:8080/user/delete?login="+GlobalVariables.USER.getLogin())
+                    .method("DELETE", null)
+                    .build();
+            try {
+                Response response = client.newCall(request).execute();
+                JOptionPane.showMessageDialog(this, "Профиль удалён, выйдите из системы");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        if(!GlobalVariables.USER.getRole().equals("admin") && !GlobalVariables.USER.getRole().equals("analyst")) {
+            jTabbedPane.remove(panelForAdmin);
+            jTabbedPane.remove(panelForAnalyst);
+
+            jTabbedPane.repaint();
+            jTabbedPane.revalidate();
+        }
+
+        buttonToTest.addActionListener(e->{
+            try {
+                TestGUI goToTest = new TestGUI();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+            setVisible(true);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         Profile personalAccountUI = new Profile();
     }
 }
