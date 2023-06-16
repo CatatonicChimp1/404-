@@ -37,7 +37,7 @@ public class RegisterMenu {
     private ApiService service;
     RegisterMenu(){
         JFrame frame = new JFrame();
-        frame.setTitle("Интеллектуальное тестирование");
+        frame.setTitle("Интеликтуальное тестирование");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(600,600);
 
@@ -120,7 +120,8 @@ public class RegisterMenu {
                         email,
                         phone,
                         0,
-                        false
+                        false,
+                        "user"
                 );
                 if(icon!= null){
                     //Отпраляем на сервер всё
@@ -177,6 +178,7 @@ public class RegisterMenu {
         loginFieldPlaneLogin = new JTextField();
         passwordFieldPlaneLogin = new JPasswordField();
         singInPlaneLogin = new JButton("Войти");
+        JButton restorePlaneLogin = new JButton("Восстановить пароль");
 
         JPanel panelLogin = new JPanel();
         panelLogin.setLayout(new BoxLayout(panelLogin, BoxLayout.Y_AXIS));
@@ -195,6 +197,10 @@ public class RegisterMenu {
         frame.add(tabbedPane);
         frame.setVisible(true);
 
+        restorePlaneLogin.addActionListener(e->{
+
+        });
+
         singInPlaneLogin.addActionListener(e->{
             OkHttpClient client = new OkHttpClient().newBuilder()
                     .build();
@@ -208,26 +214,43 @@ public class RegisterMenu {
                 Gson gson = new Gson();
                 Response response = client.newCall(request).execute();
                 GlobalVariables.USER = gson.fromJson(response.body().string(), User.class);
-                Profile profile = new Profile();
-                //System.out.println("User");
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(frame, "Не верно введён логин или пароль, осталось попыток " +
-                        (5-countErrorLogin.get()));
-                countErrorLogin.getAndIncrement();
-                if(countErrorLogin.get() > 5) {
-                    //Блокирование пользователя по login
-                    MediaType mediaTypeBlock = MediaType.parse("text/plain");
-                    RequestBody body = RequestBody.create(mediaTypeBlock, "");
-                    Request requestBlock = new Request.Builder()
-                            .url("http://localhost:8080/user/blocked?login="+loginFieldPlaneLogin.getText()+"&isBlocked=true")
-                            .method("PUT", body)
-                            .build();
-                    try {
-                        Response response = client.newCall(request).execute();
-                    } catch (IOException exc) {
-                        throw new RuntimeException(exc);
+                if(GlobalVariables.USER == null && !GlobalVariables.USER.getBlocked()){
+                    JOptionPane.showMessageDialog(frame, "Не верно введён логин или пароль, осталось попыток " +
+                            (5-countErrorLogin.get()));
+                    countErrorLogin.getAndIncrement();
+                    if(countErrorLogin.get() > 5) {
+                        //Блокирование пользователя по login
+                        MediaType mediaTypeBlock = MediaType.parse("text/plain");
+                        RequestBody body = RequestBody.create(mediaTypeBlock, "");
+                        Request requestBlock = new Request.Builder()
+                                .url("http://localhost:8080/user/blocked?login="+loginFieldPlaneLogin.getText()+"&isBlocked=true")
+                                .method("PUT", body)
+                                .build();
+                        try {
+                            response = client.newCall(requestBlock).execute();
+                        } catch (IOException exc) {
+                            throw new RuntimeException(exc);
+                        }
                     }
                 }
+                else if (countErrorLogin.get() > 6 || GlobalVariables.USER.getBlocked()) {
+                    countErrorLogin.set(0);
+                    JOptionPane.showMessageDialog(frame,"Вы заблокированы!");
+
+                    MediaType mediaTypeBlock = MediaType.parse("text/plain");
+                    RequestBody body = RequestBody.create(mediaType, "");
+                    Request requestBlock = new Request.Builder()
+                            .url("http://localhost:8080/alert/add?description="+loginFieldPlaneLogin+" пользователь заблокирован")
+                            .method("POST", body)
+                            .build();
+                    Response responseBlock = client.newCall(requestBlock).execute();
+                }
+                else {
+                    Profile profile = new Profile();
+                }
+                //System.out.println("User");
+            } catch (IOException ignored) {
+
             }
         });
 
