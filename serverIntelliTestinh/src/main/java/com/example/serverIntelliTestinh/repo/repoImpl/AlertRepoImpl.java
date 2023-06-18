@@ -1,38 +1,35 @@
 package com.example.serverIntelliTestinh.repo.repoImpl;
 
 import com.example.serverIntelliTestinh.model.Alert;
-import com.example.serverIntelliTestinh.model.User;
 import com.example.serverIntelliTestinh.repo.AlertRepo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.springframework.http.ResponseEntity;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 import java.io.*;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class AlertRepoImpl implements AlertRepo {
     private final String db = "/home/iliya/IdeaProjects/serverIntelliTestinh/src/main/resources/alert/alerts.sys";
     @Override
     public Alert[] getAll() throws FileNotFoundException, JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        Gson gson = new Gson();
         String db = new BufferedReader(new FileReader(this.db)).lines().collect(Collectors.joining());
-        Alert[] alerts = mapper.readValue(db,Alert[].class);
+        Alert[] alerts = gson.fromJson(db, Alert[].class);
         return alerts;
     }
 
     @Override
     public void save(Alert newAlert) throws IOException {
         String db = new BufferedReader(new FileReader(this.db)).lines().collect(Collectors.joining());
-        ObjectMapper mapper = new ObjectMapper();
+        Gson gson = new Gson();
 
-        JsonNode jsonNode = mapper.readTree(db);
-        ArrayNode jsonArray = (ArrayNode) jsonNode;
-        JsonNode alertJson = mapper.convertValue(newAlert, JsonNode.class);
+        JsonElement jsonElement = gson.fromJson(db, JsonElement.class);
+        JsonArray jsonArray = jsonElement.getAsJsonArray();
+        JsonElement alertJson = gson.toJsonTree(newAlert);
         jsonArray.add(alertJson);
-        String updatedJsonString = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonNode);
+        String updatedJsonString = gson.toJson(jsonElement);
         BufferedWriter writer = new BufferedWriter(new FileWriter(this.db));
         writer.write(updatedJsonString);
         writer.close();
