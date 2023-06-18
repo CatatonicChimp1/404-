@@ -55,7 +55,7 @@ public class User {
 
     @SerializedName("testIdToGrade")
     @Expose
-    private HashMap<Integer, Integer> testIdToGrade;
+    private HashMap<String, String> testIdToGrade;
 
     @SerializedName("role")
     @Expose
@@ -63,7 +63,7 @@ public class User {
 
     public User(String login, String password, String firstName, String lastName, String patronymic, String birthday,
                 int group, String secretQuestion, String answerOnQuestion, String email, String numberPhone,
-                int countItogTest, boolean blocked, String role) {
+                int countItogTest, boolean blocked, HashMap<String, String> testIdToGrade, String role) {
         this.login = login;
         this.password = password;
         this.firstName = firstName;
@@ -77,8 +77,18 @@ public class User {
         this.numberPhone = numberPhone;
         this.countItogTest = countItogTest;
         this.blocked = blocked;
+        this.testIdToGrade = testIdToGrade;
         this.role = role;
     }
+
+    public HashMap<String, String> getTestIdToGrade() {
+        return testIdToGrade;
+    }
+
+    public void setTestIdToGrade(HashMap<String, String> testIdToGrade) {
+        this.testIdToGrade = testIdToGrade;
+    }
+
     public String getLogin() {
         return login;
     }
