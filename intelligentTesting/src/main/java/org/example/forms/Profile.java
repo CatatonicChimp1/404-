@@ -3,24 +3,17 @@ package org.example.forms;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
+import org.example.api.MyRequest;
 import org.example.global.GlobalVariables;
 import org.example.model.Alert;
-import org.example.model.Test.Test;
 import org.example.model.User;
 
 import javax.swing.*;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.sql.Array;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class Profile extends JFrame {
     private JTextField loginField;
@@ -129,15 +122,7 @@ public class Profile extends JFrame {
 
         List<User> usersList =  new ArrayList<>();
 
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "");
-        Request requestAllUsers = new Request.Builder()
-                .url("http://localhost:8080/user/all")
-                .method("GET", null)
-                .build();
-        Response responseAllUsers = client.newCall(requestAllUsers).execute();
+        Response responseAllUsers = MyRequest.requestAllUser();
 
         String responseStr = responseAllUsers.body().string();
 
@@ -180,28 +165,21 @@ public class Profile extends JFrame {
         panelForAdmin.add(refresh);
 
         refresh.addActionListener(e->{
-            OkHttpClient clientAllUsers = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaTypeAllUsers = MediaType.parse("text/plain");
-            RequestBody bodyAllUsers = RequestBody.create(mediaTypeAllUsers, "");
-            Request request = new Request.Builder()
-                    .url("http://localhost:8080/alert/all")
-                    .method("GET", null)
-                    .build();
+            Response response = MyRequest.requestAllAlert();
+            assert response.body() != null;
+            java.lang.reflect.Type listAlertType = new TypeToken<List<Alert>>(){}.getType();
+            String jsonStr = null;
             try {
-                Response response = clientAllUsers.newCall(request).execute();
-                assert response.body() != null;
-                java.lang.reflect.Type listAlertType = new TypeToken<List<Alert>>(){}.getType();
-                String jsonStr = response.body().string();
-                List<Alert> alertList1 = new Gson().fromJson(jsonStr, listAlertType);
+                jsonStr = response.body().string();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+            List<Alert> alertList1 = new Gson().fromJson(jsonStr, listAlertType);
                 for(int i =0;i<alertList1.size();i++)
                 {
                     panelForAdmin.add(new JLabel(String.valueOf(alertList1.get(i).getId())));
                     panelForAdmin.add(new JLabel(alertList1.get(i).getDescription()));
                 }
-            } catch (IOException ee) {
-                throw new RuntimeException(ee);
-            }
         });
         JPanel panelForAnalyst = new JPanel();
 
@@ -217,60 +195,40 @@ public class Profile extends JFrame {
 
 
         editPersonalInfoButton.addActionListener(e->{
+            Gson gson = new Gson();
+            User updatingUser = new User(
+                    GlobalVariables.USER.getLogin(),
+                    passwordField.getText().toString(),
+                    nameField.getText().toString(),
+                    surnameField.getText().toString(),
+                    patronymicField.getText().toString(),
+                    birthdateField.getText().toString(),
+                    Integer.parseInt(groupField.getText().toString()),
+                    GlobalVariables.USER.getSecretQuestion(),
+                    GlobalVariables.USER.getAnswerOnQuestion(),
+                    emailField.getText().toString(),
+                    phoneField.getText().toString(),
+                    GlobalVariables.USER.getCountItogTest(),
+                    GlobalVariables.USER.getBlocked(),
+                    GlobalVariables.USER.getTestIdToGrade(),
+                    GlobalVariables.USER.getRole()
+            );
             //Отпраляем запрос на обновление информации
-            MediaType mediaTypeUpdate = MediaType.parse("application/json");
-            RequestBody bodyUpdate = RequestBody.create(mediaTypeUpdate, " {\n  " +
-                    "\"login\" : \""+ GlobalVariables.USER.getLogin() +"\",\n  " +
-                    "\"password\" : \""+passwordField.getText()+"\",\n  " +
-                    "\"firstName\" : \""+nameField.getText()+"\",\n  " +
-                    "\"lastName\" : \""+surnameField.getText()+"\",\n  " +
-                    "\"patronymic\" : \""+patronymicField.getText()+"\",\n  " +
-                    "\"birthday\" : \""+birthdateField.getText()+"\",\n  " +
-                    "\"group\" : "+groupField.getText()+",\n  " +
-                    "\"secretQuestion\" : \""+GlobalVariables.USER.getSecretQuestion()+"\",\n  " +
-                    "\"answerOnQuestion\" : \""+GlobalVariables.USER.getAnswerOnQuestion()+"\",\n  " +
-                    "\"email\" : \""+emailField.getText()+"\",\n  " +
-                    "\"numberPhone\" : \""+phoneField.getText()+"\"\n} ");
-            Request request = new Request.Builder()
-                    .url("http://localhost:8080/user/update?login="+GlobalVariables.USER.getLogin())
-                    .method("PUT", bodyUpdate)
-                    .addHeader("Content-Type", "application/json")
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            MyRequest.requestUpdateUser(updatingUser);
 
             //Получаем новую тинформацию
-            Request requestFromClient = new Request.Builder()
-                    .url("http://localhost:8080/user/login?login="+GlobalVariables.USER.getLogin()+
-                            "password="+passwordField.getText())
-                    .method("GET",null)
-                    .build();
+            Response response = MyRequest.getLoginUser(updatingUser.getLogin(), updatingUser.getPassword());
             try {
-                Gson gson = new Gson();
-                Response response = client.newCall(requestFromClient).execute();
+                assert response.body() != null;
                 GlobalVariables.USER = gson.fromJson(response.body().string(), User.class);
-                //System.out.println("User");
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         });
 
         deleteAccountButton.addActionListener(e->{
-            MediaType mediaTypeDelete = MediaType.parse("text/plain");
-            RequestBody bodyDelete = RequestBody.create(mediaTypeDelete, "");
-            Request request = new Request.Builder()
-                    .url("http://localhost:8080/user/delete?login="+GlobalVariables.USER.getLogin())
-                    .method("DELETE", null)
-                    .build();
-            try {
-                Response response = client.newCall(request).execute();
-                JOptionPane.showMessageDialog(this, "Профиль удалён, выйдите из системы");
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            }
+            MyRequest.deleteUser(GlobalVariables.USER.getLogin());
+            JOptionPane.showMessageDialog(this, "Профиль удалён, выйдите из системы");
         });
         if(!GlobalVariables.USER.getRole().equals("admin") && !GlobalVariables.USER.getRole().equals("analyst")) {
             jTabbedPane.remove(panelForAdmin);
