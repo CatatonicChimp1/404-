@@ -1,29 +1,64 @@
 package com.example.serverIntelliTestinh.model;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 
+import java.util.HashMap;
 
 public class User {
+
+    @SerializedName("login")
+    @Expose
     private String login;
+    @SerializedName("password")
+    @Expose
     private String password;
-    private String  firstName;
+    @SerializedName("firstName")
+    @Expose
+    private String firstName;
+    @SerializedName("lastName")
+    @Expose
     private String lastName;
+    @SerializedName("patronymic")
+    @Expose
     private String patronymic;
+    @SerializedName("birthday")
+    @Expose
     private String birthday;
+    @SerializedName("group")
+    @Expose
     private int group;
+    @SerializedName("secretQuestion")
+    @Expose
     private String secretQuestion;
+    @SerializedName("answerOnQuestion")
+    @Expose
     private String answerOnQuestion;
+    @SerializedName("email")
+    @Expose
     private String email;
+    @SerializedName("numberPhone")
+    @Expose
     private String numberPhone;
-    //private String icon;
-    //private Role role;
+    @SerializedName("countItogTest")
+    @Expose
     private int countItogTest;
+    @SerializedName("blocked")
+    @Expose
+    private boolean IsBlocked;
 
-    private boolean isBlocked;
+    @SerializedName("testIdToGrade")
+    @Expose
+    private HashMap<String, String> testIdToGrade;
 
-    public User(String login, String password, String firstName, String lastName, String patronymic, String birthday, int group, String secretQuestion, String answerOnQuestion, String email, String numberPhone) {
+    @SerializedName("role")
+    @Expose
+    private String role;
+
+    public User(String login, String password, String firstName, String lastName, String patronymic, String birthday,
+                int group, String secretQuestion, String answerOnQuestion, String email, String numberPhone,
+                int countItogTest, boolean blocked, HashMap<String, String> testIdToGrade, String role) {
         this.login = login;
         this.password = password;
         this.firstName = firstName;
@@ -35,17 +70,18 @@ public class User {
         this.answerOnQuestion = answerOnQuestion;
         this.email = email;
         this.numberPhone = numberPhone;
-        //this.icon = icon;
-        this.countItogTest = 0;
-        this.isBlocked = false;
-        //this.role = Role.USER;
+        this.countItogTest = countItogTest;
+        this.IsBlocked = blocked;
+        this.testIdToGrade = testIdToGrade;
+        this.role = role;
     }
 
-    public User(){}
+    public HashMap<String, String> getTestIdToGrade() {
+        return testIdToGrade;
+    }
 
-    public void addCountTest()
-    {
-        this.countItogTest++;
+    public void setTestIdToGrade(HashMap<String, String> testIdToGrade) {
+        this.testIdToGrade = testIdToGrade;
     }
 
     public String getLogin() {
@@ -96,11 +132,11 @@ public class User {
         this.birthday = birthday;
     }
 
-    public int getGroup() {
+    public Integer getGroup() {
         return group;
     }
 
-    public void setGroup(int group) {
+    public void setGroup(Integer group) {
         this.group = group;
     }
 
@@ -124,6 +160,7 @@ public class User {
         return email;
     }
 
+
     public void setEmail(String email) {
         this.email = email;
     }
@@ -136,21 +173,46 @@ public class User {
         this.numberPhone = numberPhone;
     }
 
-
-    public int getCountItogTest() {
+    public Integer getCountItogTest() {
         return countItogTest;
     }
 
-    public void setCountItogTest(int countItogTest) {
+    public void setCountItogTest(Integer countItogTest) {
         this.countItogTest = countItogTest;
     }
 
-    public boolean isBlocked() {
-        return isBlocked;
+    public Boolean getBlocked() {
+        return IsBlocked;
     }
 
-    public void setBlocked(boolean blocked) {
-        isBlocked = blocked;
+    public void setBlocked(Boolean blocked) {
+        this.IsBlocked = blocked;
     }
 
+    public void setAllNull()
+    {
+        this.login = null;
+        this.password = null;
+        this.firstName = null;
+        this.lastName = null;
+        this.patronymic = null;
+        this.birthday = null;
+        this.group = -1;
+        this.secretQuestion = null;
+        this.answerOnQuestion = null;
+        this.email = null;
+        this.numberPhone = null;
+        //this.icon = icon;
+        this.countItogTest = 0;
+        this.IsBlocked = false;
+        //this.role = Role.USER;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 }
