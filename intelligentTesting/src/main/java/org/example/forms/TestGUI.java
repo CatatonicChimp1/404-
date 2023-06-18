@@ -4,11 +4,17 @@ package org.example.forms;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import okhttp3.*;
+import org.example.api.MyRequest;
+import org.example.global.GlobalVariables;
 import org.example.model.Test.Test;
+import org.example.model.User;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class TestGUI extends JFrame {
     private JLabel questionLabel;
@@ -16,15 +22,6 @@ public class TestGUI extends JFrame {
     private JButton nextButton;
     private ButtonGroup buttonGroup;
     private int currentQuestion = 0;
-    private String[] questions = {"Вопрос 1", "Вопрос 2", "Вопрос 3", "Вопрос 4", "Вопрос 5"};
-    private String[][] answers = {
-            {"Ответ 1.1", "Ответ 1.2", "Ответ 1.3", "Ответ 1.4", "Ответ 1.5"},
-            {"Ответ 2.1", "Ответ 2.2", "Ответ 2.3", "Ответ 2.4", "Ответ 2.5"},
-            {"Ответ 3.1", "Ответ 3.2", "Ответ 3.3", "Ответ 3.4", "Ответ 3.5"},
-            {"Ответ 4.1", "Ответ 4.2", "Ответ 4.3", "Ответ 4.4", "Ответ 4.5"},
-            {"Ответ 5.1", "Ответ 5.2", "Ответ 5.3", "Ответ 5.4", "Ответ 5.5"}
-    };
-
     public TestGUI() throws IOException {
         setSize(500, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -58,7 +55,8 @@ public class TestGUI extends JFrame {
                 buttonGroup.add(answerButtons[i]);
                 panel.add(answerButtons[i]);
         }
-
+        AtomicReference<Integer> averageAnswer = new AtomicReference<>(0);
+        AtomicInteger count = new AtomicInteger();
         nextButton = new JButton("Ответить");
         nextButton.addActionListener(e -> {
             // Обработка ответа
@@ -68,9 +66,23 @@ public class TestGUI extends JFrame {
                     answerButtons[i].setText(test[currentQuestion].getAnswer().get(i));
                     answerButtons[i].setSelected(false);
                 }
+                if(answerButtons[test[currentQuestion].getIdTrueAnswer()].isSelected()){
+                    count.getAndIncrement();
+                    //System.out.println(count.get());
+                }
             } else {
+                if(answerButtons[test[currentQuestion-1].getIdTrueAnswer()].isSelected()){
+                    count.getAndIncrement();
+                    //System.out.println(count.get());
+                }
                 // Закончились вопросы
                 JOptionPane.showMessageDialog(this, "Тест завершен");
+                averageAnswer.set((count.get() * 100) / test.length);
+                HashMap<String,String> testIdToGrade = GlobalVariables.USER.getTestIdToGrade();
+                int testId = new Random().nextInt(0, 1024);
+                testIdToGrade.put(String.valueOf(testId), averageAnswer.get().toString());
+                GlobalVariables.USER.setTestIdToGrade(testIdToGrade);
+                MyRequest.requestUpdateUser(GlobalVariables.USER);
                 dispose();
             }
             currentQuestion++;
