@@ -2,14 +2,14 @@ package org.example.forms;
 
 import com.google.gson.Gson;
 import okhttp3.*;
-import org.example.client.ApiService;
-import org.example.client.ApiUtils;
+import org.example.api.MyRequest;
 import org.example.global.GlobalVariables;
 import org.example.model.User;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RegisterMenu {
@@ -34,12 +34,11 @@ public class RegisterMenu {
     private User newUser;
     private File icon;
 
-    private ApiService service;
-    RegisterMenu(){
+    RegisterMenu() {
         JFrame frame = new JFrame();
         frame.setTitle("Интеликтуальное тестирование");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600,600);
+        frame.setSize(600, 600);
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
@@ -99,14 +98,11 @@ public class RegisterMenu {
             String email = emailField.getText();
             String phone = phoneField.getText();
 
-
-            service = ApiUtils.getSOServer();
             // Дополнительная обработка и проверка значений полей:
             // ...
-            if(password.length()<4){
+            if (password.length() < 4) {
                 JOptionPane.showMessageDialog(frame, "Пароль должен быть больше 4-х знаков");
-            }
-            else{
+            } else {
                 newUser = new User(
                         login,
                         password,
@@ -121,38 +117,14 @@ public class RegisterMenu {
                         phone,
                         0,
                         false,
+                        null,
                         "user"
                 );
-                if(icon!= null){
+                if (icon != null) {
                     //Отпраляем на сервер всё
                     //Тестовый запрос, работает
-                    OkHttpClient client = new OkHttpClient().newBuilder()
-                            .build();
-                    MediaType mediaType = MediaType.parse("application/json");
-                    RequestBody body = RequestBody.create(mediaType, " {\n  " +
-                            "\"login\" : \""+ newUser.getLogin() +"\",\n  " +
-                            "\"password\" : \""+newUser.getPassword()+"\",\n  " +
-                            "\"firstName\" : \""+newUser.getFirstName()+"\",\n  " +
-                            "\"lastName\" : \""+newUser.getLastName()+"\",\n  " +
-                            "\"patronymic\" : \""+newUser.getPatronymic()+"\",\n  " +
-                            "\"birthday\" : \""+newUser.getBirthday()+"\",\n  " +
-                            "\"group\" : "+newUser.getGroup()+",\n  " +
-                            "\"secretQuestion\" : \""+newUser.getSecretQuestion()+"\",\n  " +
-                            "\"answerOnQuestion\" : \""+newUser.getAnswerOnQuestion()+"\",\n  " +
-                            "\"email\" : \""+newUser.getEmail()+"\",\n  " +
-                            "\"numberPhone\" : \""+newUser.getNumberPhone()+"\"\n} ");
-                    Request request = new Request.Builder()
-                            .url("http://localhost:8080/user/add")
-                            .method("POST", body)
-                            .addHeader("Accept-Charset", "application/json")
-                            .addHeader("Content-Type", "application/json")
-                            .build();
-                    try {
-                        Response response = client.newCall(request).execute();
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                }else {
+                    MyRequest.requestAddUser(newUser);
+                } else {
                     //Отправляем на сервер только пользователя, icon = null
                 }
                 System.out.println("newUser");
@@ -180,6 +152,7 @@ public class RegisterMenu {
         singInPlaneLogin = new JButton("Войти");
         JButton restorePlaneLogin = new JButton("Восстановить пароль");
 
+
         JPanel panelLogin = new JPanel();
         panelLogin.setLayout(new BoxLayout(panelLogin, BoxLayout.Y_AXIS));
 
@@ -189,72 +162,52 @@ public class RegisterMenu {
         panelLogin.add(new JLabel("Пароль"));
         panelLogin.add(passwordFieldPlaneLogin);
 
+        panelLogin.add(restorePlaneLogin);
+
         panelLogin.add(singInPlaneLogin);
 
 
-        tabbedPane.add("Регистрация",registrationPlane);
+        tabbedPane.add("Регистрация", registrationPlane);
         tabbedPane.add("Логин", panelLogin);
         frame.add(tabbedPane);
         frame.setVisible(true);
 
-        restorePlaneLogin.addActionListener(e->{
+        restorePlaneLogin.addActionListener(e -> {
 
         });
 
-        singInPlaneLogin.addActionListener(e->{
-            OkHttpClient client = new OkHttpClient().newBuilder()
-                    .build();
-            MediaType mediaType = MediaType.parse("text/plain");
-            Request request = new Request.Builder()
-                    .url("http://localhost:8080/user/login?login="+loginFieldPlaneLogin.getText()+
-                            "&password="+passwordFieldPlaneLogin.getText())
-                    .method("GET",null)
-                    .build();
+        singInPlaneLogin.addActionListener(e -> {
+            Response response = MyRequest.getLoginUser(loginFieldPlaneLogin.getText(), passwordFieldPlaneLogin.getText());
+            Gson gson = new Gson();
             try {
-                Gson gson = new Gson();
-                Response response = client.newCall(request).execute();
+                assert response.body() != null;
                 GlobalVariables.USER = gson.fromJson(response.body().string(), User.class);
-                if(GlobalVariables.USER == null && !GlobalVariables.USER.getBlocked()){
-                    JOptionPane.showMessageDialog(frame, "Не верно введён логин или пароль, осталось попыток " +
-                            (5-countErrorLogin.get()));
-                    countErrorLogin.getAndIncrement();
-                    if(countErrorLogin.get() > 5) {
-                        //Блокирование пользователя по login
-                        MediaType mediaTypeBlock = MediaType.parse("text/plain");
-                        RequestBody body = RequestBody.create(mediaTypeBlock, "");
-                        Request requestBlock = new Request.Builder()
-                                .url("http://localhost:8080/user/blocked?login="+loginFieldPlaneLogin.getText()+"&isBlocked=true")
-                                .method("PUT", body)
-                                .build();
-                        try {
-                            response = client.newCall(requestBlock).execute();
-                        } catch (IOException exc) {
-                            throw new RuntimeException(exc);
-                        }
-                    }
-                }
-                else if (countErrorLogin.get() > 6 || GlobalVariables.USER.getBlocked()) {
-                    countErrorLogin.set(0);
-                    JOptionPane.showMessageDialog(frame,"Вы заблокированы!");
-
-                    MediaType mediaTypeBlock = MediaType.parse("text/plain");
-                    RequestBody body = RequestBody.create(mediaType, "");
-                    Request requestBlock = new Request.Builder()
-                            .url("http://localhost:8080/alert/add?description="+loginFieldPlaneLogin+" пользователь заблокирован")
-                            .method("POST", body)
-                            .build();
-                    Response responseBlock = client.newCall(requestBlock).execute();
-                }
-                else {
-                    Profile profile = new Profile();
-                }
-                //System.out.println("User");
-            } catch (IOException ignored) {
-
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
-        });
+            if (GlobalVariables.USER == null && !GlobalVariables.USER.getBlocked()) {
+                JOptionPane.showMessageDialog(frame, "Не верно введён логин или пароль, осталось попыток " +
+                        (5 - countErrorLogin.get()));
+                countErrorLogin.getAndIncrement();
+                if (countErrorLogin.get() > 5) {
+                    //Блокирование пользователя по login
+                    MyRequest.blockedUser(loginFieldPlaneLogin.getText());
+                    MyRequest.requestAddAlert(loginFieldPlaneLogin.getText());
+                }
+            } else if (countErrorLogin.get() > 6 || GlobalVariables.USER.getBlocked()) {
+                countErrorLogin.set(0);
+                JOptionPane.showMessageDialog(frame, "Вы заблокированы!");
+            } else {
+                try {
+                    Profile profile = new Profile();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            //System.out.println("User");
+    });
 
-    }
+}
 
     public static void main(String[] args) {
         new RegisterMenu();
