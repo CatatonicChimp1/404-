@@ -7,12 +7,10 @@ import okhttp3.*;
 import org.example.api.MyRequest;
 import org.example.global.GlobalVariables;
 import org.example.model.Test.Test;
-import org.example.model.User;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -24,7 +22,7 @@ public class TestGUI extends JFrame {
     private int currentQuestion = 0;
     public TestGUI() throws IOException {
         setSize(500, 300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
@@ -43,7 +41,24 @@ public class TestGUI extends JFrame {
 
         java.lang.reflect.Type itemsMapType = new TypeToken<Test[]>() {}.getType();
         String responseString = response.body().string();
-        Test[] test = new Gson().fromJson(responseString, itemsMapType);
+        Test[] testAll = new Gson().fromJson(responseString, itemsMapType);
+
+        List<String> groupList = new ArrayList<>();
+
+        for (Test value : testAll) {
+            groupList.add(value.getTestGroup());
+        }
+
+        int n = (int) Math.floor(Math.random() * groupList.size());
+
+        String group = groupList.get(n);
+
+        List<Test> testFilter = Arrays.stream(testAll).filter(s -> s.getTestGroup().equals(group)).toList();
+        Test[] test = new Test[testFilter.size()];
+        for(int i=0; i<testFilter.size();i++){
+            test[i] = testFilter.get(i);
+        }
+
         answerButtons = new JRadioButton[test[0].getAnswer().size()];
         buttonGroup = new ButtonGroup();
 
