@@ -21,24 +21,44 @@
     "role": "user"
   },
   {
+    "login": "12",
+    "password": "123456",
+    "firstName": "njnl",
+    "lastName": "mkl",
+    "patronymic": "mklk",
+    "birthday": "3762",
+    "group": 3,
+    "secretQuestion": "jnkjn",
+    "answerOnQuestion": "jnkj",
+    "email": "nl",
+    "numberPhone": "mnlnmlknjk",
+    "countItogTest": 0,
+    "blocked": false,
+    "testIdToGrade": {},
+    "role": "user"
+  },
+  {
     "login": "admin",
-    "password": "root",
-    "firstName": "iliyaa",
-    "lastName": "orlov",
+    "password": "Shn0syq1U2",
+    "firstName": "admin",
+    "lastName": "lastName",
     "patronymic": "pp",
-    "birthday": "04.07.2002",
+    "birthday": "01.02.2008",
     "group": 2,
     "secretQuestion": "123",
     "answerOnQuestion": "321",
-    "email": "bkmz.or32@gmail.com",
-    "numberPhone": "+79964242485",
-    "countItogTest": 0,
+    "email": "admin@test.com",
+    "numberPhone": "+79991234511",
+    "countItogTest": 1,
     "blocked": false,
     "testIdToGrade": {
       "1": "100",
       "2": "95",
+      "255": "35",
       "3": "80",
+      "458": "25",
+      "1021": "40"
     },
-    "role": "admin"
+    "role": "analyst"
   }
 ]
