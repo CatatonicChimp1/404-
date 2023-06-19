@@ -1,20 +1,64 @@
 package com.example.serverIntelliTestinh.model.test;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.util.HashMap;
+import java.util.List;
 
 public class Test {
+    @SerializedName("id")
+    @Expose
     private int id;
-    private HashMap<String, Question> question;
+    @SerializedName("question")
+    @Expose
+    private String question;
+    @SerializedName("answer")
+    @Expose
+    private List<String> answer;
+    @SerializedName("idTrueAnswer")
+    @Expose
+    private int idTrueAnswer;
+    @SerializedName("testGroup")
+    @Expose
+    private String testGroup;
 
-    public HashMap<String, Question> getQuestion() {
+    public String getTestGroup() {
+        return testGroup;
+    }
+
+    public void setTestGroup(String testGroup) {
+        this.testGroup = testGroup;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getQuestion() {
         return question;
     }
 
-    public void setQuestion(HashMap<String, Question> question) {
+    public void setQuestion(String question) {
         this.question = question;
     }
 
-    public int getId() {
-        return this.id;
+    public List<String> getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(List<String> answer) {
+        this.answer = answer;
+    }
+
+    public int getIdTrueAnswer() {
+        return idTrueAnswer;
+    }
+
+    public void setIdTrueAnswer(int idTrueAnswer) {
+        this.idTrueAnswer = idTrueAnswer;
     }
 }
