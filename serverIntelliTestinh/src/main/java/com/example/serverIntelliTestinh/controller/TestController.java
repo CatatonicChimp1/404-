@@ -35,7 +35,12 @@ public class TestController {
     }
 
     @RequestMapping(path = "/all",method = RequestMethod.GET)
-    public ResponseEntity<Test> getAll() throws FileNotFoundException, JsonProcessingException {
+    public ResponseEntity<Test[]> getAll() throws FileNotFoundException, JsonProcessingException {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @RequestMapping(path = "/import", method = RequestMethod.POST)
+    public void importTest(@RequestBody Test[] tests){
+        service.importTest(tests);
     }
 }
