@@ -1,23 +1,251 @@
-[{
-  "id": 1,
-  "question": "What is the capital of France?",
-  "answer": [
-    "London",
-    "Paris",
-    "Berlin",
-    "Madrid"
-  ],
-  "idTrueAnswer": 1
-},
-{
-  "id": 2,
-  "question": "What is the largest ocean in the world?",
-  "answer": [
-    "Atlantic",
-    "Indian",
-    "Pacific",
-    "Arctic"
-  ],
-  "idTrueAnswer": 2
-}
+[
+  {
+      "id": 1,
+      "question": "What is a variable in programming?",
+      "answer": [
+        "A reserved memory location to store values",
+        "A mathematical operator",
+        "A way to loop through code",
+        "A type of function"
+      ],
+      "idTrueAnswer": 0,
+      "testGroup": "programming"
+    },
+    {
+      "id": 2,
+      "question": "What is the difference between an interpreter and a compiler?",
+      "answer": [
+        "An interpreter translates code into machine language, while a compiler executes code directly",
+        "An interpreter executes code directly, while a compiler translates code into machine language",
+        "An interpreter and a compiler are the same thing",
+        "An interpreter and a compiler are both used to debug code"
+      ],
+      "idTrueAnswer": 1,
+      "testGroup": "programming"
+    },
+    {
+      "id": 3,
+      "question": "What is a loop in programming and why are they used?",
+      "answer": [
+        "A way to create a new instance of a class",
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A way to create a new function"
+      ],
+      "idTrueAnswer": 2,
+      "testGroup": "programming"
+    },
+    {
+      "id": 4,
+      "question": "What is a function in programming and why are they used?",
+      "answer": [
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A way to create a new instance of a class",
+        "A block of code designed to perform a specific task"
+      ],
+      "idTrueAnswer": 3,
+      "testGroup": "programming"
+    },
+    {
+      "id": 5,
+      "question": "What is object-oriented programming?",
+      "answer": [
+        "A programming paradigm that uses objects to represent data and methods to manipulate that data",
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A way to create a new instance of a class"
+      ],
+      "idTrueAnswer": 0,
+      "testGroup": "programming"
+    },
+    {
+      "id": 6,
+      "question": "What is the difference between a class and an object?",
+      "answer": [
+        "A class is a blueprint for an object, while an object is an instance of a class",
+        "A class and an object are the same thing",
+        "A class is an instance of an object, while an object is a blueprint for a class",
+        "A class and an object are both used to store data"
+      ],
+      "idTrueAnswer": 0,
+      "testGroup": "programming"
+    },
+    {
+      "id": 7,
+      "question": "What is inheritance in programming?",
+      "answer": [
+        "A way to create a new instance of a class",
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A mechanism that allows one class to be based on another class"
+      ],
+      "idTrueAnswer": 3,
+      "testGroup": "programming"
+    },
+    {
+      "id": 8,
+      "question": "What is polymorphism in programming?",
+      "answer": [
+        "The ability of an object to take on many forms",
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A way to create a new instance of a class"
+      ],
+      "idTrueAnswer": 0,
+      "testGroup": "programming"
+    },
+    {
+      "id": 9,
+      "question": "What is encapsulation in programming?",
+      "answer": [
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A programming paradigm that uses objects to represent data and methods to manipulate that data",
+        "A mechanism that restricts access to certain components of an object"
+      ],
+      "idTrueAnswer": 3,
+      "testGroup": "programming"
+    },
+    {
+      "id": 10,
+      "question": "What is a database in programming and why are they used?",
+      "answer": [
+        "A way to store data in a variable",
+        "A way to execute code multiple times",
+        "A collection of data that is organized and can be easily accessed, managed and updated",
+        "A programming paradigm that uses objects to represent data and methods to manipulate that data"
+      ],
+      "idTrueAnswer": 2,
+      "testGroup": "programming"
+    },
+    {
+        "id": 11,
+        "question": "What is the capital of France?",
+        "answer": [
+          "London",
+          "Paris",
+          "Berlin",
+          "Madrid"
+        ],
+        "idTrueAnswer": 2,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 12,
+        "question": "What is the capital of Japan?",
+        "answer": [
+          "Beijing",
+          "Seoul",
+          "Tokyo",
+          "Singapore"
+        ],
+        "idTrueAnswer": 2,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 13,
+        "question": "What is the capital of Brazil?",
+        "answer": [
+          "Buenos Aires",
+          "Brasilia",
+          "Rio de Janeiro",
+          "Santiago"
+        ],
+        "idTrueAnswer": 1,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 14,
+        "question": "What is the capital of Germany?",
+        "answer": [
+          "Munich",
+          "Hamburg",
+          "Frankfurt",
+          "Berlin"
+        ],
+        "idTrueAnswer": 3,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 15,
+        "question": "What is the capital of Russia?",
+        "answer": [
+          "Saint Petersburg",
+          "Moscow",
+          "Kiev",
+          "Minsk"
+        ],
+        "idTrueAnswer": 1,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 16,
+        "question": "What is the capital of Australia?",
+        "answer": [
+          "Sydney",
+          "Melbourne",
+          "Canberra",
+          "Brisbane"
+        ],
+        "idTrueAnswer": 2,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 17,
+        "question": "What is the capital of Canada?",
+        "answer": [
+          "Vancouver",
+          "Montreal",
+          "Toronto",
+          "Ottawa"
+        ],
+        "idTrueAnswer": 3,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 18,
+        "question": "What is the capital of Mexico?",
+        "answer": [
+          "Bogota",
+          "Lima",
+          "Mexico City",
+          "Sao Paulo"
+        ],
+        "idTrueAnswer": 2,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 19,
+        "question": "What is the capital of Egypt?",
+        "answer": [
+          "Cairo",
+          "Alexandria",
+          "Riyadh",
+          "Istanbul"
+        ],
+        "idTrueAnswer": 0,
+        "testGroup": "world"
+      },
+
+      {
+        "id": 20,
+        "question": "What is the capital of South Africa?",
+        "answer": [
+          "Cape Town",
+          "Johannesburg",
+          "Durban",
+          "Pretoria"
+        ],
+        "idTrueAnswer": 3,
+        "testGroup": "world"
+      }
 ]
