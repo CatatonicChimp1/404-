@@ -2,10 +2,9 @@ package org.example.api;
 
 import com.google.gson.Gson;
 import okhttp3.*;
-import org.example.global.GlobalVariables;
+import org.example.model.Test.Test;
 import org.example.model.User;
 
-import javax.swing.*;
 import java.io.IOException;
 
 public class MyRequest {
@@ -47,7 +46,7 @@ public class MyRequest {
         MediaType mediaTypeUpdate = MediaType.parse("application/json");
         RequestBody bodyUpdate = RequestBody.create(mediaTypeUpdate, gson.toJson(user));
         Request request = new Request.Builder()
-                .url("http://localhost:8080/user/update?login=" + GlobalVariables.USER.getLogin())
+                .url("http://localhost:8080/user/update?login=" + user.getLogin())
                 .method("PUT", bodyUpdate)
                 .addHeader("Content-Type", "application/json")
                 .build();
@@ -66,7 +65,6 @@ public class MyRequest {
                 .method("GET", null)
                 .build();
         try {
-            Gson gson = new Gson();
             Response response = client.newCall(requestFromClient).execute();
             return response;
             //System.out.println("User");
@@ -131,6 +129,38 @@ public class MyRequest {
         try {
             Response response = clientAllAlert.newCall(request).execute();
             return response;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Response requestAllTest(){
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        Request request = new Request.Builder()
+                .url("http://localhost:8080/tests/all")
+                .method("GET", null)
+                .build();
+        try {
+            return client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void importTest(Test[] tests){
+        Gson gson = new Gson();
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, gson.toJson(tests));
+        Request request = new Request.Builder()
+                .url("http://localhost:8080/tests/import")
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .build();
+        try {
+            Response response = client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
