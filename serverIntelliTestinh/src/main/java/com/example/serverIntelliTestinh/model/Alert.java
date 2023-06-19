@@ -1,9 +1,18 @@
 package com.example.serverIntelliTestinh.model;
 
-public class Alert {
-    private int id;
-    private String description;
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
+public class Alert {
+    @SerializedName("id")
+    @Expose
+    int id;
+
+    @SerializedName("description")
+    @Expose
+    String description;
+
+    public Alert(){}
 
     public Alert(int id, String description) {
         this.id = id;
