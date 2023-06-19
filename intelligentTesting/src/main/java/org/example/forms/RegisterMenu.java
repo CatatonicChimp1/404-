@@ -1,7 +1,7 @@
 package org.example.forms;
 
 import com.google.gson.Gson;
-import okhttp3.*;
+import okhttp3.Response;
 import org.example.api.MyRequest;
 import org.example.global.GlobalVariables;
 import org.example.model.User;
@@ -117,7 +117,7 @@ public class RegisterMenu {
                         phone,
                         0,
                         false,
-                        null,
+                        new HashMap<String, String>(),
                         "user"
                 );
                 if (icon != null) {
@@ -173,7 +173,7 @@ public class RegisterMenu {
         frame.setVisible(true);
 
         restorePlaneLogin.addActionListener(e -> {
-
+            PasswordRecovery passwordRecovery = new PasswordRecovery();
         });
 
         singInPlaneLogin.addActionListener(e -> {
@@ -185,7 +185,7 @@ public class RegisterMenu {
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            if (GlobalVariables.USER == null && !GlobalVariables.USER.getBlocked()) {
+            if (GlobalVariables.USER == null || GlobalVariables.USER.getBlocked()) {
                 JOptionPane.showMessageDialog(frame, "Не верно введён логин или пароль, осталось попыток " +
                         (5 - countErrorLogin.get()));
                 countErrorLogin.getAndIncrement();
