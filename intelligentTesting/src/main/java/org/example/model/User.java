@@ -1,12 +1,10 @@
 package org.example.model;
 
-import lombok.*;
-
-
-import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import lombok.AllArgsConstructor;
 
+import javax.annotation.Generated;
 import java.util.HashMap;
 
 @AllArgsConstructor
